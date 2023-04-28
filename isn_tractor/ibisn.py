@@ -401,32 +401,31 @@ def dense_isn(
     """
     Network computation based on the Lioness algorithm
     """
-    num_samples = data.shape[1]
-    samples = data.columns
+    num_samples = data.shape[0]
+    samples = data.index
 
     if isinstance(metric, str):
         metric_fn = __dense_metric()
     else:
         metric_fn = metric  # type: ignore[assignment]
     data_transpose = data.T
-    net = metric_fn(t.tensor(data.to_numpy()))
+    net = metric_fn(t.tensor(data_transpose.to_numpy()))
     agg = net.numpy().flatten()
 
     dense = pd.DataFrame(
         np.nan,
-        index=np.arange(data.shape[0] * data.shape[0]),
+        index=np.arange(data.shape[1] * data.shape[1]),
         columns=["reg", "tar"] + list(samples),
     ).astype(object)
-    dense.iloc[:, 0] = np.repeat(data_transpose.columns.values, data.shape[0])
-    dense.iloc[:, 1] = np.tile(data_transpose.columns.values, data.shape[0])
+    dense.iloc[:, 0] = np.repeat(data.columns.values, data.shape[1])
+    dense.iloc[:, 1] = np.tile(data.columns.values, data.shape[1])
 
     for i in range(num_samples):
         values = (
-            metric_fn(t.tensor(np.delete(data.T.to_numpy(), i, 0)).to(device))
+            metric_fn(t.tensor(np.delete(data_transpose.to_numpy(), i, 1)).to(device))
             .cpu()
             .numpy()
             .flatten()
         )
         dense.iloc[:, i + 2] = num_samples * (agg - values) + values
-
     return dense

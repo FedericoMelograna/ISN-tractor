@@ -596,5 +596,6 @@ def test_dense():
     expected["snp_dvxkv"] = expected["snp_dvxkv"].astype(float32)
 
     new = dense_isn(snp_data.copy(), metric="pearson")
+    print(new.iloc[:, 2:])
 
     assert_frame_equal(expected, new)

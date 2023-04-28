@@ -23,7 +23,7 @@ def dataframe(size, values):
 
 
 u_df = dataframe((200, 500000), ["unmapped", "discrete"])
-m_df = dataframe((200, 1000), ["mapped", "continuous"])
+m_df = dataframe((20, 100), ["mapped", "continuous"])
 
 
 def interactions(n_rows):
